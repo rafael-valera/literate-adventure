@@ -11,11 +11,11 @@
     
 ### OPTIONS
 
-- -v  verbose
+- -v  --verbose
     
       Prints the filename and its path to stdout.
        
-- -m  media
+- -m  --media
     
       Includes most commom media file extensions to the search criteria.
        
