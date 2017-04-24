@@ -23,6 +23,9 @@ def main():
 
     news_event = HetNieuwsblad.get_news_content(HetNieuwsblad.NEWS_CONTENT_EXAMPLE)
     print(news_event.get_content())
+    # or
+    news_event = HetNieuwsblad.get_news_content(news_event_object.get_headline())
+    print(news_event.get_content())
 
 
 if __name__ == "__main__":
