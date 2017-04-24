@@ -157,22 +157,22 @@ class YahooForecastAPIHandler:
 
 
 def main():
-    wind_forecast_waregem = YahooForecastAPIHandler.get_wind_forecast("London")
+    wind_forecast_london = YahooForecastAPIHandler.get_wind_forecast("London")
 
-    print("Object: ", wind_forecast_waregem)
+    print("Object: ", wind_forecast_london)
 
     # geographic data
-    print("Location: ", wind_forecast_waregem.location)
-    print("Country: ", wind_forecast_waregem.country)
-    print("Region: ", wind_forecast_waregem.region)
-    print("Latitude: ", wind_forecast_waregem.latitude)
-    print("Longitude: ", wind_forecast_waregem.longitude)
+    print("Location: ", wind_forecast_london.location)
+    print("Country: ", wind_forecast_london.country)
+    print("Region: ", wind_forecast_london.region)
+    print("Latitude: ", wind_forecast_london.latitude)
+    print("Longitude: ", wind_forecast_london.longitude)
 
     # wind forecast data
-    print("Wind speed: ", wind_forecast_waregem.speed)
-    print("Wind speed category: ", wind_forecast_waregem.beaufort)
-    print("Wind cardinal direction: ", wind_forecast_waregem.direction)
-    print("Wind origin in degrees: ", wind_forecast_waregem.degrees)
+    print("Wind speed: ", wind_forecast_london.speed)
+    print("Wind speed category: ", wind_forecast_london.beaufort)
+    print("Wind cardinal direction: ", wind_forecast_london.direction)
+    print("Wind origin in degrees: ", wind_forecast_london.degrees)
 
 
 if __name__ == "__main__":
