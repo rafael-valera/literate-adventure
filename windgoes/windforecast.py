@@ -170,7 +170,7 @@ def main():
 
     # wind forecast data
     print("Wind speed: ", wind_forecast_london.speed)
-    print("Wind speed category: ", wind_forecast_london.beaufort)
+    print("Wind speed Beaufort definition: ", wind_forecast_london.beaufort)
     print("Wind cardinal direction: ", wind_forecast_london.direction)
     print("Wind origin in degrees: ", wind_forecast_london.degrees)
 
