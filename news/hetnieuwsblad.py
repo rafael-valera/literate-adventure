@@ -20,10 +20,12 @@
 """
 
 import bs4
-import requests
 import re
 import datetime
 import textwrap
+import urllib.request
+import urllib.error
+import sys
 
 
 class NewsEvent:
@@ -53,26 +55,46 @@ class NewsEvent:
 class SoupMaker:
     """ BeautifulSoup object maker """
 
-    @staticmethod
-    def __get(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept_Language": "nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4",
+        "Accept_Encoding": "gzip, deflate, sdch",
+        "Connection": "keep-alive",
+    }
+
+    @classmethod
+    def http_get_request(cls, url):
         """ Sends an GET http request and returns the response as string object """
 
-        headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                          "(KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36",
-            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept_Language": "nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4",
-            "Accept_Encoding": "gzip, deflate, sdch",
-            "Connection": "keep-alive",
-        }
-        return requests.get(url=url, headers=headers).text
+        try:
+            request = urllib.request.Request(url, headers=cls.headers)
+            response = urllib.request.urlopen(request)
+        except urllib.error.HTTPError as http_error:
+            print("Connection error: ", http_error)
+            sys.exit(1)
+        except urllib.error.URLError as url_error:
+            print("URL error :", url_error)
+            sys.exit(1)
+        else:
+            if response.reason == "OK" and response.status == 200:
+                return response.read().decode("utf-8")
+            else:
+                exception = "Bad http response. Status: {} Reason: {}".format(response.status, response.reason)
+                print(exception)
+                sys.exit(1)
 
-    @staticmethod
-    def make_soup(url):
+    @classmethod
+    def make_soup(cls, url):
         """Constructs a BeautifulSoup object from a url"""
-        response = SoupMaker.__get(url)
-        return bs4.BeautifulSoup(response, "html.parser")
+        response = cls.http_get_request(url)
+        if not response:
+            print("Connection Error: Unable to retrieve URL resource")
+            sys.exit(1)
+        else:
+            return bs4.BeautifulSoup(response, "html.parser")
 
 
 class HetNieuwsblad:
