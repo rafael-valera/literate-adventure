@@ -49,7 +49,10 @@ class NewsEvent:
         return self.content
 
     def __str__(self):
-        return "<NewsEvent {} {} >".format(self.date.date(), self.headline)
+        try:
+            return "<NewsEvent {} {} >".format(self.date.date(), self.headline)
+        except AttributeError:
+            return "<NewsEvent {} {} >".format(None, self.headline)
 
 
 class SoupMaker:
@@ -111,7 +114,7 @@ class HetNieuwsblad:
     @staticmethod
     def get_headlines(main_page_url):
         """ Retrieves HetNieuwsblad headlines on the site main pages.
-            If it cannot parse the headline, it will return None. """
+            If an AttributeError or KeyError is raised, it yields nothing. """
 
         # creates a beautifulSoup object
         soup = SoupMaker.make_soup(main_page_url)
@@ -125,7 +128,9 @@ class HetNieuwsblad:
                 headline = headline.strip()
                 headline_link = headline_link.strip()
             except AttributeError:
-                yield None
+                pass
+            except KeyError:
+                pass
             else:
                 yield NewsEvent(headline=headline, link=headline_link, date=date_time, content="")
 
@@ -137,18 +142,22 @@ class HetNieuwsblad:
         soup = SoupMaker.make_soup(url)
 
         # fetches headline string
-        headline = soup.find("h1", {"itemprop": "name"}).string
-        div_element_article_body = soup.find("div", class_="article__body")
+        try:
+            headline = soup.find("h1", {"itemprop": "name"}).string
+            div_element_article_body = soup.find("div", class_="article__body")
 
-        # constructs content NewsEvent content from all paragraphs found in the div element
-        content = ""
-        for p_element in div_element_article_body.find_all_next("p"):
-            content += "\n".join(textwrap.wrap(p_element.text, 100)) + "\n\n"
+            # constructs content NewsEvent content from all paragraphs found in the div element
+            content = ""
+            for p_element in div_element_article_body.find_all_next("p"):
+                content += "\n".join(textwrap.wrap(p_element.text, 100)) + "\n\n"
 
-        datetime_string = soup.find("time", {"itemprop": "datePublished"})["datetime"]
-        datetime_object = datetime.datetime.strptime(datetime_string, "%Y-%m-%d %H:%M+02:00")
-
-        return NewsEvent(headline=headline, link=url, date=datetime_object, content=content)
+            datetime_string = soup.find("time", {"itemprop": "datePublished"})["datetime"]
+            datetime_object = datetime.datetime.strptime(datetime_string, "%Y-%m-%d %H:%M+02:00")
+        except AttributeError:
+            print("Content error: not a http://www.nieuwsblad.be news content url")
+            sys.exit(1)
+        else:
+            return NewsEvent(headline=headline, link=url, date=datetime_object, content=content)
 
     @staticmethod
     def __parse_headline_datetime(headline_url):
@@ -164,7 +173,7 @@ class HetNieuwsblad:
             datetime_object = datetime.datetime.strptime(datetime_string, "%Y%m%d")
             return datetime_object
         else:
-            return datetime.datetime.fromtimestamp(0)
+            return None
 
 
 def main():
